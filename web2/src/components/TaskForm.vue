@@ -60,6 +60,22 @@
       </v-col>
     </v-row>
 
+    <v-row v-if="dynamicVars.length > 0">
+      <v-col>
+        <span class="text-subtitle-1 d-block mb-4">Dynamic Variables</span>
+        <v-text-field
+          v-for="(variable, index) in dynamicVars"
+          :value ="variable.value"
+          @input="updateDynamicVariables($event, index)"
+          :key="variable.name"
+          :label="variable.name"
+          :rules="[v => (!variable.required || !!v) || `${variable.name} is required`]"
+          :disabled="formSaving"
+          class="py-0"
+        ></v-text-field>
+      </v-col>
+    </v-row>
+
   </v-form>
 </template>
 <script>
@@ -81,6 +97,23 @@ export default {
       commitAvailable: null,
     };
   },
+
+  computed: {
+    dynamicVars: {
+      get() {
+        if ((this.item !== null) && !(this.item.dynamic_vars === '' || this.item.dynamic_vars === undefined)) {
+          return JSON.parse(this.item.dynamic_vars);
+        }
+        return [];
+      },
+      set(newValue) {
+        if (this.item !== null) {
+          this.$set(this.item, 'dynamic_vars', JSON.stringify(newValue));
+        }
+      },
+    },
+  },
+
   watch: {
     needReset(val) {
       if (val) {
@@ -137,6 +170,15 @@ export default {
 
     getItemsUrl() {
       return `/api/project/${this.projectId}/tasks`;
+    },
+
+    updateDynamicVariables(variableValue, index) {
+      const variables = this.dynamicVars;
+      const newVariable = variables[index];
+      newVariable.value = variableValue;
+      const newDynamicVars = this.dynamicVars.slice();
+      newDynamicVars.splice(index, 1, newVariable);
+      this.dynamicVars = newDynamicVars;
     },
   },
 };

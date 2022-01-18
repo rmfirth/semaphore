@@ -12,7 +12,7 @@ func (d *SqlDb) CreateTemplate(template db.Template) (newTemplate db.Template, e
 	if err != nil {
 		return
 	}
-
+// TODO: update
 	insertID, err := d.insert(
 		"id",
 		"insert into project__template (project_id, inventory_id, repository_id, environment_id, " +

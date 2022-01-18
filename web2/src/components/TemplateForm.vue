@@ -215,6 +215,13 @@ Example:
             @click:append-outer="showHelpDialog('cron')"
         ></v-text-field>
       </v-col>
+      <v-col cols="12" class="pb-0">
+        <TemplateDynamicVariableTable
+          :variables="dynamicVars"
+          :disabled="formSaving"
+          @change="dynamicVars = $event"
+          />
+      </v-col>
     </v-row>
   </v-form>
 </template>
@@ -229,13 +236,14 @@ import 'codemirror/lib/codemirror.css';
 import 'codemirror/mode/vue/vue.js';
 // import 'codemirror/addon/lint/json-lint.js';
 import 'codemirror/addon/display/placeholder.js';
+import TemplateDynamicVariableTable from '@/components/TemplateDynamicVariableTable';
 import { TEMPLATE_TYPE_ICONS, TEMPLATE_TYPE_TITLES } from '../lib/constants';
 
 export default {
   mixins: [ItemFormBase],
 
   components: {
-    codemirror,
+    codemirror, TemplateDynamicVariableTable,
   },
 
   props: {
@@ -306,6 +314,20 @@ export default {
         return null;
       }
       return this.keys.filter((key) => key.type === 'login_password');
+    },
+
+    dynamicVars: {
+      get() {
+        if ((this.item !== null) && !(this.item.dynamic_vars === '' || this.item.dynamic_vars === undefined)) {
+          return JSON.parse(this.item.dynamic_vars);
+        }
+        return [];
+      },
+      set(newValue) {
+        if (this.item !== null) {
+          this.$set(this.item, 'dynamic_vars', JSON.stringify(newValue));
+        }
+      },
     },
   },
 
