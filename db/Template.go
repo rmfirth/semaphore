@@ -44,6 +44,7 @@ type Template struct {
 	ViewID *int `db:"view_id" json:"view_id"`
 
 	LastTask *TaskWithTpl `db:"-" json:"last_task"`
+	DynamicVars	string	  `db:"dynamic_vars" json:"dynamic_vars"`
 }
 
 func (tpl *Template) Validate() error {
