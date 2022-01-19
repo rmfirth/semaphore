@@ -71,7 +71,7 @@
           :label="variable.name"
           :rules="[v => (!variable.required || !!v) || `${variable.name} is required`]"
           :disabled="formSaving"
-          class="py-0"
+          class="py-0 my-4"
         ></v-text-field>
       </v-col>
     </v-row>
@@ -95,23 +95,8 @@ export default {
       template: null,
       buildTasks: null,
       commitAvailable: null,
+      dynamicVars: null,
     };
-  },
-
-  computed: {
-    dynamicVars: {
-      get() {
-        if ((this.item !== null) && !(this.item.dynamic_vars === '' || this.item.dynamic_vars === undefined)) {
-          return JSON.parse(this.item.dynamic_vars);
-        }
-        return [];
-      },
-      set(newValue) {
-        if (this.item !== null) {
-          this.$set(this.item, 'dynamic_vars', JSON.stringify(newValue));
-        }
-      },
-    },
   },
 
   watch: {
@@ -143,7 +128,8 @@ export default {
     isLoaded() {
       return this.item != null
           && this.template != null
-          && this.buildTasks != null;
+          && this.buildTasks != null
+          && this.dynamicVars != null;
     },
 
     async afterLoadData() {
@@ -154,6 +140,12 @@ export default {
         url: `/api/project/${this.projectId}/templates/${this.templateId}`,
         responseType: 'json',
       })).data;
+
+      if (!(this.template.dynamic_vars === '' || this.template.dynamic_vars === undefined)) {
+        this.dynamicVars = JSON.parse(this.template.dynamic_vars);
+      } else {
+        this.dynamicVars = [];
+      }
 
       this.buildTasks = this.template.type === 'deploy' ? (await axios({
         keys: 'get',
@@ -179,6 +171,16 @@ export default {
       const newDynamicVars = this.dynamicVars.slice();
       newDynamicVars.splice(index, 1, newVariable);
       this.dynamicVars = newDynamicVars;
+    },
+
+    async beforeSave() {
+      const dynamicVars = {};
+      this.dynamicVars.forEach((item) => {
+        const itemKey = item.name;
+        const itemValue = item.value;
+        dynamicVars[itemKey] = itemValue;
+      });
+      this.item.dynamic_vars = JSON.stringify(dynamicVars);
     },
   },
 };
