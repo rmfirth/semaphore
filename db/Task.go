@@ -34,6 +34,7 @@ type Task struct {
 
 	BuildTaskID *int    `db:"build_task_id" json:"build_task_id"`
 	Version     *string `db:"version" json:"version"`
+	DynamicVars	string	 `db:"dynamic_vars" json:"dynamic_vars"`
 }
 
 func (task *Task) ValidateNewTask(template Template) error {

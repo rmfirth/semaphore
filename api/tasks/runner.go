@@ -635,6 +635,13 @@ func (t *task) getExtraVars() (str string, err error) {
 
 	delete(extraVars, "ENV")
 
+	if t.task.DynamicVars != "" {
+		err = json.Unmarshal([]byte(t.task.DynamicVars), &extraVars)
+		if err != nil {
+			return
+		}
+	}
+
 	if util.Config.VariablesPassingMethod == util.VariablesPassingBoth ||
 		util.Config.VariablesPassingMethod == util.VariablesPassingExtra {
 
