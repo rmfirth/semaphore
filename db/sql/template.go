@@ -12,13 +12,13 @@ func (d *SqlDb) CreateTemplate(template db.Template) (newTemplate db.Template, e
 	if err != nil {
 		return
 	}
-// TODO: update
+
 	insertID, err := d.insert(
 		"id",
 		"insert into project__template (project_id, inventory_id, repository_id, environment_id, " +
 			"alias, playbook, arguments, override_args, description, vault_key_id, `type`, start_version," +
-			"build_template_id, view_id)" +
-			"values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+			"build_template_id, view_id, dynamic_vars)" +
+			"values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
 		template.ProjectID,
 		template.InventoryID,
 		template.RepositoryID,
@@ -32,7 +32,8 @@ func (d *SqlDb) CreateTemplate(template db.Template) (newTemplate db.Template, e
 		template.Type,
 		template.StartVersion,
 		template.BuildTemplateID,
-		template.ViewID)
+		template.ViewID,
+		template.DynamicVars)
 
 	if err != nil {
 		return
@@ -70,7 +71,8 @@ func (d *SqlDb) UpdateTemplate(template db.Template) error {
 		"`type`=?, " +
 		"start_version=?," +
 		"build_template_id=?, " +
-		"view_id=? " +
+		"view_id=?, " +
+		"dynamic_vars=? " +
 		"where removed = false and id=? and project_id=?",
 		template.InventoryID,
 		template.RepositoryID,
@@ -85,6 +87,7 @@ func (d *SqlDb) UpdateTemplate(template db.Template) error {
 		template.StartVersion,
 		template.BuildTemplateID,
 		template.ViewID,
+		template.DynamicVars,
 		template.ID,
 		template.ProjectID,
 	)
@@ -102,6 +105,7 @@ func (d *SqlDb) getTemplates(projectID int, viewID *int, params db.RetrieveQuery
 		"pt.override_args",
 		"pt.vault_key_id",
 		"pt.view_id",
+		"pt.dynamic_vars",
 		"pt.`type`").
 		From("project__template pt").
 		Where("pt.removed = false")

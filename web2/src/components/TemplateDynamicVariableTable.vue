@@ -36,7 +36,6 @@
 
 <script>
 /* eslint-disable import/extensions */
-// TODO: add hint for "required"?
 import TemplateDynamicVariable from '@/components/TemplateDynamicVariable';
 
 export default {

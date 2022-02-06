@@ -1,1 +1,0 @@
-alter table `project__template` add `dyanmic_vars` longtext not null;
